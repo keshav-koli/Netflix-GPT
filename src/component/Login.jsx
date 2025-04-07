@@ -1,16 +1,56 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Header from "./Header";
+import {
+  validateFormDataBySignIn,
+  validateFormDataBySignUp,
+} from "../utils/FormValidation";
+
 // import netflix_backgroundImage from "../../public/netflix_backgroundImage";
 const Login = () => {
   const [FormData, SetFormData] = useState(true);
+
+  const [ResultOfValidation, setResultOfValidation] = useState(null);
 
   const handleForm = (e) => {
     e.preventDefault();
     SetFormData(!FormData);
   };
 
+  const name = useRef(null);
+  const email = useRef(null);
+  const password = useRef(null);
+  const phone = useRef(null);
+
+  const handleSubmitFormBySignIn = (e) => {
+    e.preventDefault();
+    // console.log(email);
+    // console.log(password);
+    console.log(email.current.value);
+    console.log(password.current.value);
+    const message = validateFormDataBySignIn(
+      email.current.value,
+      password.current.value
+    );
+    setResultOfValidation(message);
+  };
+
+  const handleSubmitFormBySignUp = (e) => {
+    e.preventDefault();
+
+    console.log(name.current.value);
+    console.log(email.current.value);
+    console.log(phone.current.value);
+
+    const message = validateFormDataBySignUp(
+      name.current.value,
+      email.current.value,
+      phone.current.value
+    );
+    setResultOfValidation(message);
+  };
+
   return (
-    <div className="">
+    <div>
       <Header />
       <div>
         <img
@@ -24,16 +64,24 @@ const Login = () => {
           <form className="text-white ">
             <p className="text-4xl font-medium ml-10 mt-10">Sign In</p>
             <input
+              ref={email}
               type="text"
-              placeholder="Email or mobile number"
-              className="border-2 w-4/5 ml-10 my-8 p-2 rounded-sm text-[#606060] placeholder:text-white "
+              placeholder="Email"
+              className="border-2 w-4/5 ml-10 my-8 p-2 border-[#606060]  rounded-sm  placeholder:text-white "
             ></input>
             <input
-              type="text"
+              ref={password}
+              type="password"
               placeholder="Password"
-              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm text-[#606060] placeholder:text-white   "
+              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white   "
             ></input>
-            <button className="bg-red-600 w-4/5 ml-10 mb-4 font-medium p-2 rounded-sm cursor-pointer">
+            <p className="ml-10  text-red-500 absolute top-65 text-lg font-medium">
+              {ResultOfValidation}
+            </p>
+            <button
+              className="bg-red-600 w-4/5 ml-10 mb-4 mt-5 font-medium p-2 rounded-sm cursor-pointer"
+              onClick={handleSubmitFormBySignIn}
+            >
               Sign in
             </button>
             <p className=" ml-47 mb-4">OR</p>
@@ -65,22 +113,31 @@ const Login = () => {
             <p className="text-4xl font-medium ml-10 mt-10">Sign Up</p>
             <input
               type="text"
+              ref={name}
               placeholder="Full Name"
-              className="border-2 w-4/5 ml-10 my-8 p-2 rounded-sm text-[#606060] placeholder:text-white  "
+              className="border-2 w-4/5 ml-10 my-8 p-2 rounded-sm border-[#606060] placeholder:text-white  "
             ></input>
             <input
               type="email"
+              ref={email}
               placeholder="Email"
-              className="border-2 w-4/5 ml-10 mb-8 p-2 rounded-sm text-[#606060] placeholder:text-white  "
+              className="border-2 w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white  "
             ></input>
             <input
               type="text"
+              ref={phone}
               placeholder="Mobile Number"
-              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm text-[#606060] placeholder:text-white   "
+              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white   "
             ></input>
-            <button className="bg-red-600 w-4/5 ml-10 mb-4 font-medium p-2 rounded-sm cursor-pointer" onClick={(e)=>alert("Sign Up Successfully")}>
+            <button
+              className="bg-red-600 w-4/5 ml-10 mb-4 font-medium p-2 rounded-sm cursor-pointer"
+              onClick={handleSubmitFormBySignUp}
+            >
               Sign Up
             </button>
+            <p className="ml-10  text-red-500 mb-2 text-lg font-medium">
+              {ResultOfValidation}
+            </p>
             <p className="text-sm text-gray-500 ml-10 mb-2">
               This page is protected by Google reCAPTCHA to ensure you're not a
               bot.
