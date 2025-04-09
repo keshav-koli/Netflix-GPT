@@ -4,6 +4,11 @@ import {
   validateFormDataBySignIn,
   validateFormDataBySignUp,
 } from "../utils/FormValidation";
+import { auth } from "../utils/firebase";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 
 // import netflix_backgroundImage from "../../public/netflix_backgroundImage";
 const Login = () => {
@@ -32,6 +37,23 @@ const Login = () => {
       password.current.value
     );
     setResultOfValidation(message);
+    if (message) return;
+
+    signInWithEmailAndPassword(
+      auth,
+      email.current.value,
+      password.current.value
+    )
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(user);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setResultOfValidation(errorCode + " - " + errorMessage);
+      });
   };
 
   const handleSubmitFormBySignUp = (e) => {
@@ -40,13 +62,33 @@ const Login = () => {
     console.log(name.current.value);
     console.log(email.current.value);
     console.log(phone.current.value);
+    console.log(password.current.value);
 
     const message = validateFormDataBySignUp(
       name.current.value,
       email.current.value,
-      phone.current.value
+      phone.current.value,
+      password.current.value
     );
     setResultOfValidation(message);
+    if (message) return;
+    createUserWithEmailAndPassword(
+      auth,
+      email.current.value,
+      password.current.value
+    )
+      .then((userCredential) => {
+        // Signed up
+        const user = userCredential.user;
+        user.displayName = name.current.value;
+        user.phoneNumber = phone.current.value;
+        console.log(user);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setResultOfValidation(errorCode + " - " + errorMessage);
+      });
   };
 
   return (
@@ -73,13 +115,13 @@ const Login = () => {
               ref={password}
               type="password"
               placeholder="Password"
-              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white   "
+              className="border-2  w-4/5 ml-10 mb-9 p-2 rounded-sm border-[#606060] placeholder:text-white   "
             ></input>
-            <p className="ml-10  text-red-500 absolute top-65 text-lg font-medium">
+            <p className="ml-10  text-red-500 absolute top-62 text-lg font-medium">
               {ResultOfValidation}
             </p>
             <button
-              className="bg-red-600 w-4/5 ml-10 mb-4 mt-5 font-medium p-2 rounded-sm cursor-pointer"
+              className="bg-red-600 w-4/5 ml-10 mb-4 mt-6 font-medium p-2 rounded-sm cursor-pointer"
               onClick={handleSubmitFormBySignIn}
             >
               Sign in
@@ -108,7 +150,7 @@ const Login = () => {
           </form>
         </div>
       ) : (
-        <div className=" p-4 w-4/14 h-6/8 absolute top-20 mx-auto left-0 right-0  bg-black opacity-82 rounded-lg">
+        <div className=" p-4 w-4/14 h-7/8 absolute top-20 mx-auto left-0 right-0  bg-black opacity-82 rounded-lg">
           <form className="text-white ">
             <p className="text-4xl font-medium ml-10 mt-10">Sign Up</p>
             <input
@@ -129,6 +171,12 @@ const Login = () => {
               placeholder="Mobile Number"
               className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white   "
             ></input>
+            <input
+              ref={password}
+              type="password"
+              placeholder="Password"
+              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white   "
+            ></input>
             <button
               className="bg-red-600 w-4/5 ml-10 mb-4 font-medium p-2 rounded-sm cursor-pointer"
               onClick={handleSubmitFormBySignUp}
@@ -138,6 +186,16 @@ const Login = () => {
             <p className="ml-10  text-red-500 mb-2 text-lg font-medium">
               {ResultOfValidation}
             </p>
+            <p className=" text-gray-500 ml-10 mb-2">
+              Already a user ?{" "}
+              <button
+                className="text-white cursor-pointer  font-medium"
+                onClick={handleForm}
+              >
+                Sign in
+              </button>
+            </p>
+
             <p className="text-sm text-gray-500 ml-10 mb-2">
               This page is protected by Google reCAPTCHA to ensure you're not a
               bot.
