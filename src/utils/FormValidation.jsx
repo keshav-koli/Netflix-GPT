@@ -18,7 +18,8 @@ export function validateFormDataBySignUp(...resArgs) {
 
   let name = /^[A-Za-zÀ-ÿ\s'-]+$/.test(Name);
   let email = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(Email);
-  let phone = /^(\+)([0-9]{2})(\s)(\d{10})$/.test(Phone);
+  // let phone = /^(\+)([0-9]{2})(\s)(\d{10})$/.test(Phone);
+  let phone = /^(\d{10})$/.test(Phone);
   let password = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/.test(
     Password
   );

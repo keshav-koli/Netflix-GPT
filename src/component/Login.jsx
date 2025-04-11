@@ -8,14 +8,19 @@ import { auth } from "../utils/firebase";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 
-// import netflix_backgroundImage from "../../public/netflix_backgroundImage";
 const Login = () => {
   const [FormData, SetFormData] = useState(true);
-
+  const navigate = useNavigate();
   const [ResultOfValidation, setResultOfValidation] = useState(null);
+  const dispatch = useDispatch();
 
+  // !========== Form ====================
   const handleForm = (e) => {
     e.preventDefault();
     SetFormData(!FormData);
@@ -26,6 +31,7 @@ const Login = () => {
   const password = useRef(null);
   const phone = useRef(null);
 
+  // ! ========== Sign In==================
   const handleSubmitFormBySignIn = (e) => {
     e.preventDefault();
     // console.log(email);
@@ -48,14 +54,17 @@ const Login = () => {
         // Signed in
         const user = userCredential.user;
         console.log(user);
+        navigate("/browser");
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         setResultOfValidation(errorCode + " - " + errorMessage);
+        navigate("/");
       });
   };
 
+  // !=========== Sign Up=================
   const handleSubmitFormBySignUp = (e) => {
     e.preventDefault();
 
@@ -80,14 +89,39 @@ const Login = () => {
       .then((userCredential) => {
         // Signed up
         const user = userCredential.user;
-        user.displayName = name.current.value;
-        user.phoneNumber = phone.current.value;
+        updateProfile(auth.currentUser, {
+          displayName: name.current.value,
+          phoneNumber: phone.current.value,
+          photoURL:
+            "https://avatars.githubusercontent.com/u/171242187?s=400&u=52d24ff6d1b2115ef9c632576dd7bc25b81b6177&v=4",
+        })
+          .then(() => {
+            // Profile updated!
+            const { uid, displayName, email, phoneNumber, photoURL } =
+              auth.currentUser;
+            dispatch(
+              addUser({
+                uid: uid,
+                displayName: displayName,
+                email: email,
+                phoneNumber: phoneNumber,
+                photoURL: photoURL,
+              })
+            );
+            navigate("/browser");
+          })
+          .catch((error) => {
+            // An error occurred
+            // ...
+            console.log(error);
+          });
         console.log(user);
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
         setResultOfValidation(errorCode + " - " + errorMessage);
+        navigate("/");
       });
   };
 
@@ -96,7 +130,7 @@ const Login = () => {
       <Header />
       <div>
         <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/fbf440b2-24a0-49f5-b2ba-a5cbe8ea8736/web/IN-en-20250324-TRIFECTA-perspective_d7c906ec-0531-47de-8ece-470d5061c88a_large.jpg"
+          src="/login_backgroundImage2.jpg"
           alt=""
           className=" w-full h-screen object-cover "
         />
@@ -115,6 +149,7 @@ const Login = () => {
               ref={password}
               type="password"
               placeholder="Password"
+              autoComplete="on"
               className="border-2  w-4/5 ml-10 mb-9 p-2 rounded-sm border-[#606060] placeholder:text-white   "
             ></input>
             <p className="ml-10  text-red-500 absolute top-62 text-lg font-medium">
@@ -166,7 +201,7 @@ const Login = () => {
               className="border-2 w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white  "
             ></input>
             <input
-              type="text"
+              type="number"
               ref={phone}
               placeholder="Mobile Number"
               className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white   "
@@ -175,7 +210,8 @@ const Login = () => {
               ref={password}
               type="password"
               placeholder="Password"
-              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white   "
+              autoComplete="on"
+              className="border-2  w-4/5 ml-10 mb-8 p-2 rounded-sm border-[#606060] placeholder:text-white"
             ></input>
             <button
               className="bg-red-600 w-4/5 ml-10 mb-4 font-medium p-2 rounded-sm cursor-pointer"
